@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DUDE Airdrop</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="./css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>DUDE</h1>
+            <div id="user-profile" class="user-profile">
+                <img id="user-photo" src="" alt="User Photo">
+            </div>
+        </header>
+        
+        <nav>
+            <button class="nav-btn active" data-page="home">Home</button>
+            <button class="nav-btn" data-page="leaderboard">Leaderboard</button>
+            <button class="nav-btn" data-page="refer">Refer</button>
+        </nav>
+        
+        <main>
+            <div id="home-page" class="page active">
+                <!-- Home content will be loaded here -->
+            </div>
+            
+            <div id="leaderboard-page" class="page">
+                <!-- Leaderboard content will be loaded here -->
+            </div>
+            
+            <div id="refer-page" class="page">
+                <!-- Refer content will be loaded here -->
+            </div>
+        </main>
+    </div>
+    
+    <script src="./js/auth.js"></script>
+    <script src="./js/app.js"></script>
+    <script src="./js/home.js"></script>
+    <script src="./js/leaderboard.js"></script>
+    <script src="./js/refer.js"></script>
+</body>
+                                                                </html
