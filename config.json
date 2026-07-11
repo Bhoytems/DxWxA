@@ -1,9 +1,9 @@
 {
-  "engine_running": false,
+  "engine_running": true,
   "assets": {
-    "gbpusd_otc": false,
-    "xauusd_otc": false,
-    "btc_otc": false
+    "gbpusd_otc": true,
+    "xauusd_otc": true,
+    "btc_otc": true
   },
   "channels": [
     {"chat_id": "-100xxxxxxxxxx", "label": "Example — replace or remove"}
