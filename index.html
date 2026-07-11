@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signal Engine — Results</title>
+<style>
+  :root {
+    --bg: #000; --panel: #0a0a0a; --border: #1f1f1f;
+    --text: #e6e6e6; --text-dim: #8a8a8a;
+    --buy: #21c55d; --sell: #ef4444; --blue: #3b82f6;
+    --mono: 'SF Mono', Consolas, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
+  header { padding:20px 24px; border-bottom:1px solid var(--border); }
+  header h1 { font-size:15px; letter-spacing:2px; margin:0; }
+  header h1 span { color:var(--blue); }
+  main { max-width:900px; margin:0 auto; padding:24px; }
+  .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:24px; }
+  .stat { background:var(--panel); border:1px solid var(--border); border-radius:10px; text-align:center; padding:16px 8px; }
+  .stat-num { display:block; font-size:22px; font-weight:700; font-family:var(--mono); }
+  .win { color:var(--buy); } .loss { color:var(--sell); }
+  .stat-label { display:block; font-size:10px; color:var(--text-dim); text-transform:uppercase; margin-top:4px; letter-spacing:1px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; background:var(--panel); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+  th { text-align:left; color:var(--text-dim); font-size:10px; text-transform:uppercase; letter-spacing:1px; padding:10px; border-bottom:1px solid var(--border); }
+  td { padding:10px; border-bottom:1px solid #141414; }
+  .dir-call { color:var(--buy); font-weight:700; } .dir-put { color:var(--sell); font-weight:700; }
+  .result-win { color:var(--buy); font-weight:700; } .result-loss { color:var(--sell); font-weight:700; } .result-pending { color:var(--text-dim); }
+  .mono { font-family:var(--mono); color:var(--text-dim); font-size:11px; }
+  .empty { text-align:center; color:var(--text-dim); padding:30px; }
+</style>
+</head>
+<body>
+<header><h1><span>◆</span> SIGNAL ENGINE — RESULTS</h1></header>
+<main>
+  <div class="stats" id="stats"></div>
+  <table>
+    <thead><tr><th>Time (WAT)</th><th>Asset</th><th>Dir</th><th>Entry</th><th>Exit</th><th>Result</th><th>ID</th></tr></thead>
+    <tbody id="tbody"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody>
+  </table>
+</main>
+<script>
+const ASSET_LABELS = { gbpusd_otc: "GBPUSD OTC", xauusd_otc: "XAUUSD OTC", btc_otc: "Bitcoin OTC" };
+
+fetch("data/signals.json?t=" + Date.now())
+  .then(r => r.json())
+  .then(signals => {
+    const resolved = signals.filter(s => s.result !== "PENDING");
+    const wins = resolved.filter(s => s.result === "WIN").length;
+    const losses = resolved.filter(s => s.result === "LOSS").length;
+    const total = resolved.length;
+    const winRate = total ? Math.round((wins / total) * 1000) / 10 : 0;
+
+    document.getElementById("stats").innerHTML = `
+      <div class="stat"><span class="stat-num">${signals.length}</span><span class="stat-label">Signals</span></div>
+      <div class="stat"><span class="stat-num win">${wins}</span><span class="stat-label">Wins</span></div>
+      <div class="stat"><span class="stat-num loss">${losses}</span><span class="stat-label">Losses</span></div>
+      <div class="stat"><span class="stat-num">${winRate}%</span><span class="stat-label">Win rate</span></div>
+    `;
+
+    const tbody = document.getElementById("tbody");
+    if (signals.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" class="empty">No signals yet</td></tr>`;
+      return;
+    }
+    const sorted = [...signals].reverse();
+    tbody.innerHTML = sorted.map(s => `
+      <tr>
+        <td>${s.sent_at_wat || "—"}</td>
+        <td>${ASSET_LABELS[s.asset_key] || s.asset_key}</td>
+        <td class="${s.direction === "CALL" ? "dir-call" : "dir-put"}">${s.direction === "CALL" ? "BUY" : "SELL"}</td>
+        <td>${s.entry_price ?? "—"}</td>
+        <td>${s.exit_price ?? "—"}</td>
+        <td class="result-${s.result.toLowerCase()}">${s.result}</td>
+        <td class="mono">${s.id}</td>
+      </tr>
+    `).join("");
+  })
+  .catch(() => {
+    document.getElementById("tbody").innerHTML = `<tr><td colspan="7" class="empty">Couldn't load data/signals.json</td></tr>`;
+  });
+</script>
+</body>
+</html>
